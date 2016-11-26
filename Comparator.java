@@ -25,6 +25,7 @@ public class Comparator extends Cache implements ALUCompareTo {
     private int trappedNumberDatabit = 0;
     private String errorStatusCheckBit = "No Error";
     private String errorStatusDataBit = "No Error";
+    private boolean checkBitError, dataBitError;
 
     public Comparator(int[] req, int[] rec) {
         super(req, rec);
@@ -77,29 +78,30 @@ public class Comparator extends Cache implements ALUCompareTo {
 
     public void createDataBitRec() {
         this.dataBitRec[11] = this.checkBitRec[0];
-        this.dataBitRec[10]= this.checkBitRec[1];
+        this.dataBitRec[10] = this.checkBitRec[1];
         this.dataBitRec[9] = this.tempRec[0];
-        this.dataBitRec[8]= this.checkBitRec[2];
-        this.dataBitRec[7]= this.tempRec[1];
-        this.dataBitRec[6]= this.tempRec[2];
-        this.dataBitRec[5]= this.tempRec[3];
-        this.dataBitRec[4]= this.checkBitRec[3];
-        this.dataBitRec[3]= this.tempRec[4];
-        this.dataBitRec[2]= this.tempRec[5];
-        this.dataBitRec[1]= this.tempRec[6];
-        this.dataBitRec[0]= this.tempRec[7];
+        this.dataBitRec[8] = this.checkBitRec[2];
+        this.dataBitRec[7] = this.tempRec[1];
+        this.dataBitRec[6] = this.tempRec[2];
+        this.dataBitRec[5] = this.tempRec[3];
+        this.dataBitRec[4] = this.checkBitRec[3];
+        this.dataBitRec[3] = this.tempRec[4];
+        this.dataBitRec[2] = this.tempRec[5];
+        this.dataBitRec[1] = this.tempRec[6];
+        this.dataBitRec[0] = this.tempRec[7];
         System.out.println(Arrays.toString(dataBitRec));
     }
 
-    public void syndromeError(){
-        for(int i = 0; i<dataBitReq.length;i++){
-            if(dataBitRec[i]!=dataBitReq[i]){
-                errorIndex.add(12-i);
+    public ArrayList<Integer> syndromeError() {
+        for (int i = 0; i < dataBitReq.length; i++) {
+            if (dataBitRec[i] != dataBitReq[i]) {
+                errorIndex.add(12 - i);
             }
         }
         System.out.println(errorIndex.toString());
+        return errorIndex;
     }
-    
+
     @Override
     public void compareTo() {
         this.getRecBit();
@@ -112,7 +114,8 @@ public class Comparator extends Cache implements ALUCompareTo {
         for (int i = 0; i < checkBitReq.length; i++) {
             if (this.checkBitRec[i] != this.checkBitReq[i]) {
                 trappedNumberCheckbit += 1;
-                this.errorStatusCheckBit = "CheckBit Error!!!";
+                this.checkBitError = true;
+                this.errorStatusCheckBit = "CheckBit Error";
                 System.out.println(this.errorStatusCheckBit);
             }
         }
@@ -120,25 +123,53 @@ public class Comparator extends Cache implements ALUCompareTo {
         for (int i = 0; i < tempReq.length; i++) {
             if (this.tempRec[i] != this.requestBit[j]) {
                 trappedNumberDatabit += 1;
-                this.errorStatusDataBit = "DataBitError!!!";
+                this.errorStatusDataBit = "DataBit Error";
+                this.dataBitError = true;
                 System.out.println(this.errorStatusDataBit);
             }
             j--;
         }
+        this.createDataBitRec();
+        this.createDataBitReq();
     }
-    public int[] getDataBitReq(){
+    
+
+    public int[] getDataBitReq() {
         return this.dataBitReq;
     }
-    public int[] getDataBitRec(){
+
+    public int[] getDataBitRec() {
         return this.dataBitRec;
     }
-    public void setDataBitReq(int index, int x){
+
+    public void setDataBitReq(int index, int x) {
         this.dataBitReq[index] = x;
     }
-    public void setDataBitRec(int index, int x){
+
+    public void setDataBitRec(int index, int x) {
         this.dataBitRec[index] = x;
     }
-    public ArrayList<Integer> getErrorIndex(){
+
+    public ArrayList<Integer> getErrorIndex() {
         return this.errorIndex;
+    }
+    
+    public int getDistance(){
+        return this.trappedNumberCheckbit + this.trappedNumberDatabit;
+    }
+    
+    public String getErrorMessages() {
+        if (this.checkBitError) {
+            return this.errorStatusCheckBit;
+        } 
+        else if (this.dataBitError) {
+            return this.errorStatusDataBit;
+        }
+        else if(this.dataBitError && this.checkBitError){
+            return this.errorStatusCheckBit + ", " + this.errorStatusDataBit;
+        }
+        else{
+            return "No Error";
+        }
     }
 }
