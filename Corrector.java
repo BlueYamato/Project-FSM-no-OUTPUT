@@ -17,7 +17,7 @@ public class Corrector {
         int[] dataBitRec = comp.getDataBitRec();
         ArrayList<Integer> syndrome = comp.getErrorIndex();
         for(int i = syndrome.size() - 1; i >= 0; i--){
-            int dataIndex = syndrome.get(i);
+            int dataIndex = toDecimal(syndrome.get(i));
             if(dataBitRec[12 - dataIndex] == 0){
                 comp.setDataBitRec(12-dataIndex, 1);
             }
@@ -26,5 +26,17 @@ public class Corrector {
             }
         }
         System.out.println(Arrays.toString(comp.getDataBitRec()));
+    }
+    
+    private int toDecimal(int x){
+        int result = 0;
+        int pow = 0;
+        while(x!=0){
+            int y = x%10;
+             result+= y*(int)Math.pow(2, pow);
+             pow++;
+             x = x/10;
+        }
+        return result;
     }
 }

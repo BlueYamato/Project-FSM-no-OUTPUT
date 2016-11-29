@@ -11,13 +11,13 @@ package Model;
  */
 public class Tester {
     public static void main(String[] args) {
-        int[] req = {1,1,1,0,0,1,1,0};
-        int[] rec = {0,0,1,1,1,1,0,1,0,1,1,0};
+        int[] req = {1,0,0,1,1,1,0,0};
+        int[] rec = {1,1,1,1,0,0,1,0,1,1,0,0};
         Comparator comparator = new Comparator(req, rec);
         Corrector cor = new Corrector();
         comparator.compareTo();
-        comparator.createDataBitReq();
-        comparator.createDataBitRec();
+        //comparator.createDataBitReq();
+        //comparator.createDataBitRec();
         comparator.syndromeError();
         cor.correct(comparator);
     }

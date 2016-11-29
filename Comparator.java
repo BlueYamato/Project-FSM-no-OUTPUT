@@ -32,14 +32,15 @@ public class Comparator extends Cache implements ALUCompareTo {
     }
 
     private void getReqCheckBit() {
-        int c1 = ((((this.requestBit[7] ^ this.requestBit[6]) ^ this.requestBit[4]) ^ this.requestBit[3]) ^ this.requestBit[1]);
-        int c2 = ((((this.requestBit[7] ^ this.requestBit[5]) ^ this.requestBit[4]) ^ this.requestBit[2]) ^ this.requestBit[1]);
-        int c4 = (((this.requestBit[6] ^ this.requestBit[5]) ^ this.requestBit[4]) ^ this.requestBit[0]);
-        int c8 = (((this.requestBit[3] ^ this.requestBit[2]) ^ this.requestBit[1]) ^ this.requestBit[0]);
+        int c1 = ((((this.requestBit[0] ^ this.requestBit[1]) ^ this.requestBit[3]) ^ this.requestBit[4]) ^ this.requestBit[6]);
+        int c2 = ((((this.requestBit[0] ^ this.requestBit[2]) ^ this.requestBit[3]) ^ this.requestBit[5]) ^ this.requestBit[6]);
+        int c4 = (((this.requestBit[1] ^ this.requestBit[2]) ^ this.requestBit[3]) ^ this.requestBit[7]);
+        int c8 = (((this.requestBit[4] ^ this.requestBit[5]) ^ this.requestBit[6]) ^ this.requestBit[7]);
         this.checkBitReq[0] = c1;
         this.checkBitReq[1] = c2;
         this.checkBitReq[2] = c4;
         this.checkBitReq[3] = c8;
+        System.out.println(Arrays.toString(this.checkBitReq));
     }
 
     private void getRecBit() {
@@ -54,52 +55,54 @@ public class Comparator extends Cache implements ALUCompareTo {
     }
 
     private void getRecCheckBit() {
-        this.checkBitRec[0] = this.receiveBit[7];
-        this.checkBitRec[1] = this.receiveBit[3];
-        this.checkBitRec[2] = this.receiveBit[1];
-        this.checkBitRec[3] = this.receiveBit[0];
+        this.checkBitRec[0] = this.receiveBit[0];
+        this.checkBitRec[1] = this.receiveBit[1];
+        this.checkBitRec[2] = this.receiveBit[3];
+        this.checkBitRec[3] = this.receiveBit[7];
     }
 
     public void createDataBitReq() {
         this.dataBitReq[11] = this.checkBitReq[0];
         this.dataBitReq[10] = this.checkBitReq[1];
-        this.dataBitReq[9] = this.requestBit[7];
+        this.dataBitReq[9] = this.requestBit[0];
         this.dataBitReq[8] = this.checkBitReq[2];
-        this.dataBitReq[7] = this.requestBit[6];
-        this.dataBitReq[6] = this.requestBit[5];
-        this.dataBitReq[5] = this.requestBit[4];
+        this.dataBitReq[7] = this.requestBit[1];
+        this.dataBitReq[6] = this.requestBit[2];
+        this.dataBitReq[5] = this.requestBit[3];
         this.dataBitReq[4] = this.checkBitReq[3];
-        this.dataBitReq[3] = this.requestBit[3];
-        this.dataBitReq[2] = this.requestBit[2];
-        this.dataBitReq[1] = this.requestBit[1];
-        this.dataBitReq[0] = this.requestBit[0];
+        this.dataBitReq[3] = this.requestBit[4];
+        this.dataBitReq[2] = this.requestBit[5];
+        this.dataBitReq[1] = this.requestBit[6];
+        this.dataBitReq[0] = this.requestBit[7];
         System.out.println(Arrays.toString(dataBitReq));
     }
 
     public void createDataBitRec() {
         this.dataBitRec[11] = this.checkBitRec[0];
         this.dataBitRec[10] = this.checkBitRec[1];
-        this.dataBitRec[9] = this.tempRec[0];
+        this.dataBitRec[9] = this.tempRec[7];
         this.dataBitRec[8] = this.checkBitRec[2];
-        this.dataBitRec[7] = this.tempRec[1];
-        this.dataBitRec[6] = this.tempRec[2];
-        this.dataBitRec[5] = this.tempRec[3];
+        this.dataBitRec[7] = this.tempRec[6];
+        this.dataBitRec[6] = this.tempRec[5];
+        this.dataBitRec[5] = this.tempRec[4];
         this.dataBitRec[4] = this.checkBitRec[3];
-        this.dataBitRec[3] = this.tempRec[4];
-        this.dataBitRec[2] = this.tempRec[5];
-        this.dataBitRec[1] = this.tempRec[6];
-        this.dataBitRec[0] = this.tempRec[7];
+        this.dataBitRec[3] = this.tempRec[3];
+        this.dataBitRec[2] = this.tempRec[2];
+        this.dataBitRec[1] = this.tempRec[1];
+        this.dataBitRec[0] = this.tempRec[0];
         System.out.println(Arrays.toString(dataBitRec));
     }
-
-    public ArrayList<Integer> syndromeError() {
+    
+    public ArrayList getSyndrome(){
+        return this.errorIndex;
+    }
+    public void syndromeError() {
         for (int i = 0; i < dataBitReq.length; i++) {
             if (dataBitRec[i] != dataBitReq[i]) {
-                errorIndex.add(12 - i);
+                errorIndex.add(Integer.parseInt(Integer.toBinaryString(12 - i)));
             }
         }
         System.out.println(errorIndex.toString());
-        return errorIndex;
     }
 
     @Override
@@ -129,8 +132,9 @@ public class Comparator extends Cache implements ALUCompareTo {
             }
             j--;
         }
-        this.createDataBitRec();
+        
         this.createDataBitReq();
+        this.createDataBitRec();
     }
     
 
@@ -159,14 +163,14 @@ public class Comparator extends Cache implements ALUCompareTo {
     }
     
     public String getErrorMessages() {
-        if (this.checkBitError) {
+        if(this.dataBitError && this.checkBitError){
+            return this.errorStatusCheckBit + ", " + this.errorStatusDataBit;
+        }
+        else if (this.checkBitError) {
             return this.errorStatusCheckBit;
         } 
         else if (this.dataBitError) {
             return this.errorStatusDataBit;
-        }
-        else if(this.dataBitError && this.checkBitError){
-            return this.errorStatusCheckBit + ", " + this.errorStatusDataBit;
         }
         else{
             return "No Error";
